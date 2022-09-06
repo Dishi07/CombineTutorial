@@ -8,22 +8,22 @@ enum MyError: Error {
 }
 
 
-let subject = PassthroughSubject<String, MyError>()
+let subject = PassthroughSubject<String, Never>()
 
-subject.sink(
-    receiveCompletion: { completion in
-        print("recieved completion: ", completion)
-    },
-    receiveValue: { value in
-        print("recieved value: ", value)
+
+final class Receiver {
+    let subscription: AnyCancellable
+    init() {
+        subscription = subject.sink { value in
+            print("Received value:", value)
+        }
     }
-)
+}
 
-
+let receiver = Receiver()
 subject.send("a")
 subject.send("i")
 subject.send("u")
 subject.send("e")
 subject.send("o")
-subject.send(completion: .failure(.failed))
 subject.send("aiueod")
