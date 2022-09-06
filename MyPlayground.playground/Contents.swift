@@ -9,14 +9,19 @@ enum MyError: Error {
 
 
 let subject = PassthroughSubject<String, Never>()
-
+final class SomeObject {
+    var value: String = "" {
+        didSet {
+            print("didSet value:", value)
+        }
+    }
+}
 
 final class Receiver {
-    let subscription: AnyCancellable
+    var subscriptions = Set<AnyCancellable>()
+    let object = SomeObject()
     init() {
-        subscription = subject.sink { value in
-            print("Received value:", value)
-        }
+        subject.assign(to: \.value, on: object).store(in: &subscriptions)
     }
 }
 
